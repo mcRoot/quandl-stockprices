@@ -1,1 +1,1 @@
-web: gunicorn mc.stockprices:app
+web: gunicorn mc.stockprices.app:app
