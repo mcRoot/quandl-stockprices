@@ -3,7 +3,8 @@ import datetime
 
 messages = {
     "errors": {
-        "ticker_not_found": "You must specify a valid ticker"
+        "ticker_not_found": "You must specify a valid ticker.",
+        "no_data_found": "No data was found for the specified ticker code '{}'."
     }
 }
 

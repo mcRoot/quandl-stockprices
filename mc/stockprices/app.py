@@ -11,23 +11,30 @@ pm = PlottingManager()
 def price_trend(ticker=None):
     if request.method == 'POST':
         if ticker is None:
-            return make_response(render_template('prices.html', error=messages.errors.ticker_not_found))
+            return make_response(render_template('prices.html', error=messages["errors"]["ticker_not_found"]))
         else:
+            script = None
+            div = None
+            error_message = ""
             to_date_cfg = app_config["to_date"]
             to_date_parsed = np.datetime64(to_date_cfg, 'D'),
             to_date = "{}".format(to_date_cfg)
             from_date_parsed = to_date_parsed[0] - app_config["days_back"]
             from_date = "{}".format(str(from_date_parsed)[:10])
-            ticker_model = tm.retrieve_ticker(ticker=ticker, from_date=from_date, to_date=to_date,
-                                              columns=app_config["columns"])
-            script, div = pm.plot(ticker=ticker_model)
-            return render_template("prices.html", script=script, div=div)
+            ticker = ticker.upper()
+            try:
+                ticker_model = tm.retrieve_ticker(ticker=ticker, from_date=from_date, to_date=to_date,
+                                                  columns=app_config["columns"])
+                script, div = pm.plot(ticker=ticker_model)
+            except ValueError as e:
+                error_message = messages["errors"][str(e)].format(ticker);
+            return render_template("prices.html", ticker=ticker, script=script, div=div, error=error_message)
     else:
         redirect(url_for("prices"))
 
 @app.route('/prices')
 def prices():
-    return render_template('prices.html')
+    return render_template('prices.html', ticker="")
 
 @app.route('/')
 def index():

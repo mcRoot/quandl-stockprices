@@ -20,11 +20,15 @@
 <body>
 <div class="container">
     <h2>QUANDL Stock Prices Trend</h2>
-    <div/>
+    <div id="error_message" class="alert alert-danger">
+    {% if error %}
+    {{ error }}
+    {% endif %}
+    </div>
     <form class="form-inline" id="prices-form" method="POST">
         <div class="form-group">
             <label for="ticker">Ticker name:</label>
-            <input type="text" class="form-control" id="ticker" placeholder="FB" name="ticker">
+            <input type="text" class="form-control" id="ticker" placeholder="FB" name="ticker" value="{{ ticker }}">
         </div>
         <a href="#" class="btn btn-primary" id="submit-price" role="button">Show</a>
     </form>
@@ -43,13 +47,19 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript">
       $(document).ready(function() {
+
+        error_msg = $('#error_message').text()
+        if (!error_msg || /^\s*$/.test(error_msg)) {
+            $('#error_message').hide();
+        }
         $("a#submit-price").on("click", function(e) {
             e.preventDefault();
             val = $("#ticker").val();
             if (val) {
                 $('#prices-form').attr('action', "/prices/" + val + "/trend").submit();
             } else {
-                alert("Error");
+                $('#error_message').text('A ticker code is mandatory in order to plot the corresponding price trend.');
+                $('#error_message').show();
             }
         });
       });

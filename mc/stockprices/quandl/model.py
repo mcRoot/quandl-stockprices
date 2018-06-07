@@ -9,6 +9,8 @@ class Ticker:
             raise ValueError("Ticker name cannot be undefined")
         if "date" not in columns:
             raise ValueError("Date column is mandatory")
+        if data.shape[0] == 0:
+            raise ValueError("no_data_found")
         self.name = name
         self.data = pd.DataFrame(data, columns=columns)
         self._clean_data()
