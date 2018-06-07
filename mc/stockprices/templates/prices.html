@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Skeleton application demoing Heroku and Flask integration.">
+    <meta name="author" content="@gotoariel">
+    <title>QUANDL Stock Prices</title>
+    <link rel="shortcut icon" type="image/png" href="/static/imgs/favicon.png">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.js"></script>
+    {% autoescape false %}
+    {% if script %}
+    {{ script }}
+    {% endif %}
+    {% endautoescape %}
+</head>
+<body>
+<div class="container">
+    <h2>QUANDL Stock Prices Trend</h2>
+    <div/>
+    <form class="form-inline" id="prices-form" method="POST">
+        <div class="form-group">
+            <label for="ticker">Ticker name:</label>
+            <input type="text" class="form-control" id="ticker" placeholder="FB" name="ticker">
+        </div>
+        <a href="#" class="btn btn-primary" id="submit-price" role="button">Show</a>
+    </form>
+</div>
+<div class="container">
+    {% autoescape false %}
+    {% if div %}
+    {{ div }}
+    {% endif %}
+    {% endautoescape %}
+</div>
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+      $(document).ready(function() {
+        $("a#submit-price").on("click", function(e) {
+            e.preventDefault();
+            val = $("#ticker").val();
+            if (val) {
+                $('#prices-form').attr('action', "/prices/" + val + "/trend").submit();
+            } else {
+                alert("Error");
+            }
+        });
+      });
+</script>
+</body>
+</html>
