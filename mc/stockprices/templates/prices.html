@@ -1,14 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Skeleton application demoing Heroku and Flask integration.">
-    <meta name="author" content="@gotoariel">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
     <title>QUANDL Stock Prices</title>
     <link rel="shortcut icon" type="image/png" href="/static/imgs/favicon.png">
-    <!-- Bootstrap core CSS -->
+
+    <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- MetisMenu CSS -->
+    <link href="/static/css/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/static/css/sb-admin-2.min.css" rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <!-- Bokeh -->
     <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.css" rel="stylesheet" type="text/css">
     <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.js"></script>
     {% autoescape false %}
@@ -16,53 +33,187 @@
     {{ script }}
     {% endif %}
     {% endautoescape %}
-</head>
-<body>
-<div class="container">
-    <h2>QUANDL Stock Prices Trend</h2>
-    <div id="error_message" class="alert alert-danger">
-    {% if error %}
-    {{ error }}
-    {% endif %}
-    </div>
-    <form class="form-inline" id="prices-form" method="POST">
-        <div class="form-group">
-            <label for="ticker">Ticker name:</label>
-            <input type="text" class="form-control" id="ticker" placeholder="FB" name="ticker" value="{{ ticker }}">
-        </div>
-        <a href="#" class="btn btn-primary" id="submit-price" role="button">Show</a>
-    </form>
-</div>
-<div class="container">
-    {% autoescape false %}
-    {% if div %}
-    {{ div }}
-    {% endif %}
-    {% endautoescape %}
-</div>
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-      $(document).ready(function() {
 
-        error_msg = $('#error_message').text()
-        if (!error_msg || /^\s*$/.test(error_msg)) {
-            $('#error_message').hide();
-        }
-        $("a#submit-price").on("click", function(e) {
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/"><i class="fa fa-dashboard fa-fw"></i>Quandl Stock Prices Search</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li class="sidebar-search">
+                            <div id="error_message" class="alert alert-danger alert-dismissable" style="display: none;">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <p></p>
+                            </div>
+                            <div id="date-range" style="background: #fff; cursor: pointer; padding: 1px 1px; border: 1px solid #ccc; width: 100%">
+							<i class="fa fa-calendar"></i>&nbsp;
+							<span></span> <i class="fa fa-caret-down"></i>
+							</div>
+							<div class="input-group custom-search-form">
+                                <div class="form-group" id="ticker-container">
+                                	<input id="ticker" type="text" class="form-control" value="{{ ticker }}" placeholder="Ticker code (e.g. FB)">
+                                </div>
+                                <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="submit-price">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                            </div>
+                            <form class="form-inline" id="prices-form" method="POST">
+                            <input name="from" id="from" type="hidden">
+                            <input name="to" id="to" type="hidden">
+                            <div class="form-group">
+								<label class="checkbox-inline">
+									<input name="open" type="checkbox" {% if 'open' in measures %}checked="true"{% endif %}>open
+								</label>
+								<label class="checkbox-inline">
+									<input name="high" type="checkbox" {% if 'high' in measures %}checked="true"{% endif %}>high
+								</label>
+								<label class="checkbox-inline">
+									<input name="low" type="checkbox" {% if 'low' in measures %}checked="true"{% endif %}>low
+								</label>
+							</div>
+							<div class="form-group">
+								<label class="checkbox-inline">
+									<input name="close" type="checkbox" {% if 'close' in measures %}checked="true"{% endif %}>close
+								</label>
+                            </div>
+                            </form>
+                            <!-- /input-group -->
+                        </li>
+                </div>  
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper">
+            <!-- row -->
+            <div class="row">
+            	<div class="col-lg-8">
+            	&nbsp;
+            	</div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-8">
+                    {% if chart_error %}
+                    <div class="alert alert-danger alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <p>{{ chart_error }}</p>
+                    </div>
+                    {% endif %}
+                    {% if div %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i>
+                            {% autoescape false %}
+                            {{ chart_title }}
+                            {% endautoescape %}
+                            <div class="pull-right">
+                                
+                            </div>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                        {% autoescape false %}
+    					{{ div }}
+    					{% endautoescape %}
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    {% endif %}
+                    <!-- /.panel -->
+                    
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <!-- Date picker range related -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- Custom JavaScript -->
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var start = moment("{{ start_date }}");
+		var end = moment("{{ end_date }}");
+
+		function cb(start, end) {
+			$('#date-range span').html(start.format('YYYY/MM/DD') + ' <strong>-</strong> ' + end.format('YYYY/MM/DD'));
+		}
+
+		$('#date-range').daterangepicker({
+			startDate: start,
+			endDate: end,
+			maxDate: moment("{{ max_date }}"),
+			ranges: {
+			   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+			   'This Month': [moment().startOf('month'), moment().endOf('month')],
+			   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			}
+		}, cb);
+
+		cb(start, end);
+        $('#error_message').hide();
+
+        $("#submit-price").on("click", function(e) {
             e.preventDefault();
             val = $("#ticker").val();
             if (val) {
+                dates = $('#date-range').data('daterangepicker');
+                $('input#to').val(moment(dates.endDate._d).format('YYYY-MM-DD'));
+                $('input#from').val(moment(dates.startDate._d).format('YYYY-MM-DD')); 
                 $('#prices-form').attr('action', "/prices/" + val + "/trend").submit();
             } else {
-                $('#error_message').text('A ticker code is mandatory in order to plot the corresponding price trend.');
+                $('#ticker-container').addClass("has-error")
+                $('#error_message>p').text('A ticker code is mandatory in order to show the corresponding price trend.');
                 $('#error_message').show();
             }
         });
       });
-</script>
+	</script>
+
+
+
 </body>
+
 </html>

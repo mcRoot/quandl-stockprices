@@ -13,28 +13,38 @@ def price_trend(ticker=None):
         if ticker is None:
             return make_response(render_template('prices.html', error=messages["errors"]["ticker_not_found"]))
         else:
+            ticker = ticker.upper()
             script = None
             div = None
-            error_message = ""
-            to_date_cfg = app_config["to_date"]
-            to_date_parsed = np.datetime64(to_date_cfg, 'D'),
-            to_date = "{}".format(to_date_cfg)
-            from_date_parsed = to_date_parsed[0] - app_config["days_back"]
-            from_date = "{}".format(str(from_date_parsed)[:10])
-            ticker = ticker.upper()
+            error_message = None
+            chart_title = ""
+
+            to_date = request.form["to"]
+            from_date = request.form["from"]
+
+            measure_list = []
+            for c in app_config["supported_charts"]:
+                if (request.form.get(c)):
+                    measure_list.append(c)
+
             try:
                 ticker_model = tm.retrieve_ticker(ticker=ticker, from_date=from_date, to_date=to_date,
                                                   columns=app_config["columns"])
-                script, div = pm.plot(ticker=ticker_model)
+                script, div = pm.plot(ticker=ticker_model, measures=measure_list)
+                chart_title = messages["info"]["chart"].format(ticker, from_date, to_date);
             except ValueError as e:
                 error_message = messages["errors"][str(e)].format(ticker);
-            return render_template("prices.html", ticker=ticker, script=script, div=div, error=error_message)
+            return render_template("prices.html", ticker=ticker, script=script, div=div, measures=measure_list,
+                                   chart_error=error_message, chart_title=chart_title, max_date=app_config["max_date"],
+                                   start_date=from_date, end_date=to_date)
     else:
         redirect(url_for("prices"))
 
 @app.route('/prices')
 def prices():
-    return render_template('prices.html', ticker="")
+    return render_template('prices.html', measures=app_config["default_measures"], ticker="",
+                           start_date=app_config["from_date"], end_date=app_config["to_date"],
+                           max_date=app_config["max_date"])
 
 @app.route('/')
 def index():
