@@ -74,4 +74,7 @@ class PlottingManager:
             p.square(data.index, data["low"], size=8, legend="low", fill_color=None, line_color=self.line_color[2])
 
         p.legend.location = "top_left"
+        p.legend.orientation = "horizontal"
+        p.legend.click_policy = "mute"
+
         return components(p)
