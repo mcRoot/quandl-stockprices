@@ -2,7 +2,7 @@ from mc.stockprices.quandl.client import QuandlClient
 from mc.stockprices.quandl.model import Ticker
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import NumeralTickFormatter
+from bokeh.models import NumeralTickFormatter, Legend
 
 class TableManager:
 
@@ -39,7 +39,7 @@ class PlottingManager:
 
         p = figure(title="", sizing_mode="scale_width", x_axis_label="Date", y_axis_label="Price", x_axis_type="datetime")
         p.plot_width = 700
-        p.plot_height = 400
+        p.plot_height = 440
         p.title.text_color = self.text_color
 
         p.xaxis.axis_line_color = self.text_color
@@ -52,29 +52,35 @@ class PlottingManager:
         p.yaxis.major_label_text_color = self.text_color
 
         p.yaxis[0].formatter = NumeralTickFormatter(format="$0.00")
+        legend_items = []
 
         if "close" in measures:
-            p.line(data.index, data["close"], legend="close", line_color=self.line_color[3],
+            r1 = p.line(data.index, data["close"], line_color=self.line_color[3],
                 line_width=1, alpha=0.8)
-            p.circle(data.index, data["close"], size=8, legend="close", fill_color=None, line_color=self.line_color[3])
+            r2 = p.circle(data.index, data["close"], size=8, fill_color=None, line_color=self.line_color[3])
+            legend_items.append(("close", [r1, r2]))
 
         if "open" in measures:
-            p.line(data.index, data["open"], legend="open", line_color=self.line_color[0],
+            r1 = p.line(data.index, data["open"], line_color=self.line_color[0],
                    line_width=1, alpha=0.8)
-            p.triangle(data.index, data["open"], size=8, legend="open", fill_color=None, line_color=self.line_color[0])
+            r2 = p.triangle(data.index, data["open"], size=8, fill_color=None, line_color=self.line_color[0])
+            legend_items.append(("open", [r1, r2]))
+
 
         if "high" in measures:
-            p.line(data.index, data["high"], legend="high", line_color=self.line_color[1],
+            r1 = p.line(data.index, data["high"], line_color=self.line_color[1],
                    line_width=1, alpha=0.8)
-            p.diamond(data.index, data["high"], size=8, legend="high", fill_color=None, line_color=self.line_color[1])
+            r2 = p.diamond(data.index, data["high"], size=8, fill_color=None, line_color=self.line_color[1])
+            legend_items.append(("high", [r1, r2]))
+
 
         if "low" in measures:
-            p.line(data.index, data["low"], legend="low", line_color=self.line_color[2],
+            r1 = p.line(data.index, data["low"], legend="low", line_color=self.line_color[2],
                    line_width=1, alpha=0.8)
-            p.square(data.index, data["low"], size=8, legend="low", fill_color=None, line_color=self.line_color[2])
+            r2 = p.square(data.index, data["low"], size=8, legend="low", fill_color=None, line_color=self.line_color[2])
+            legend_items.append(("low", [r1, r2]))
 
-        p.legend.location = "top_left"
-        p.legend.orientation = "horizontal"
-        p.legend.click_policy = "mute"
+        legend = Legend(items=legend_items, location=(0, 15), orientation="horizontal", click_policy="hide")
+        p.add_layout(legend, 'above')
 
         return components(p)
