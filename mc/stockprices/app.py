@@ -7,7 +7,7 @@ app = Flask(__name__)
 tm = TableManager(table=app_config["table"], apikey=app_config["apy_key"])
 pm = PlottingManager()
 
-@app.route('/prices/<ticker>/trend', methods=['POST'])
+@app.route('/prices/<ticker>/trend', methods=['POST', 'GET'])
 def price_trend(ticker=None):
     if request.method == 'POST':
         if ticker is None:
@@ -38,7 +38,7 @@ def price_trend(ticker=None):
                                    chart_error=error_message, chart_title=chart_title, max_date=app_config["max_date"],
                                    start_date=from_date, end_date=to_date)
     else:
-        redirect(url_for("prices"))
+        return redirect(url_for("prices"))
 
 @app.route('/prices')
 def prices():
