@@ -38,8 +38,8 @@ class PlottingManager:
         columns = data.columns.values
 
         p = figure(title="", sizing_mode="scale_width", x_axis_label="Date", y_axis_label="Price", x_axis_type="datetime")
-        p.plot_width = 700
-        p.plot_height = 440
+        p.plot_width = 800
+        p.plot_height = 550
         p.title.text_color = self.text_color
 
         p.xaxis.axis_line_color = self.text_color
@@ -75,9 +75,9 @@ class PlottingManager:
 
 
         if "low" in measures:
-            r1 = p.line(data.index, data["low"], legend="low", line_color=self.line_color[2],
+            r1 = p.line(data.index, data["low"], line_color=self.line_color[2],
                    line_width=1, alpha=0.8)
-            r2 = p.square(data.index, data["low"], size=8, legend="low", fill_color=None, line_color=self.line_color[2])
+            r2 = p.square(data.index, data["low"], size=8, fill_color=None, line_color=self.line_color[2])
             legend_items.append(("low", [r1, r2]))
 
         legend = Legend(items=legend_items, location=(0, 15), orientation="horizontal", click_policy="hide")
