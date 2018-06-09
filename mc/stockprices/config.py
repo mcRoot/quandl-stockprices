@@ -1,5 +1,12 @@
 import numpy as np
 import datetime
+import os
+import json
+
+env_data = {}
+
+with open('env-config.json') as json_data_file:
+    env_data = json.load(json_data_file)
 
 messages = {
     "errors": {
@@ -12,7 +19,7 @@ messages = {
 }
 
 app_config = {
-    "apy_key": "v_fSkbj2m-Mw1wxb4GNq",
+    "apy_key": os.environ.get('QUANDL_KEY', env_data["quandl"]["api_key"]),
     "table": "WIKI/PRICES",
     "to_date": '2018-03-27',#datetime.datetime.now().strftime("%Y-%m-%d"),
     "max_date": '2018-03-27',
