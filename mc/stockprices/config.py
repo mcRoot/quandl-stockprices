@@ -1,10 +1,10 @@
 import os
 
-
 messages = {
     "errors": {
         "ticker_not_found": "You must specify a valid ticker.",
-        "no_data_found": "No data was found for the specified ticker code '{}'."
+        "no_data_found": "No data was found for the specified ticker code '{}'.",
+        "quandl_connection_error": "Error connecting to QUANDL: code {} - '{}'."
     },
     "info": {
         "chart": "<strong>{}</strong> Price Trend from <strong>{}</strong> to <strong>{}</strong>"
@@ -12,7 +12,7 @@ messages = {
 }
 
 app_config = {
-    "apy_key": os.environ.get('QUANDL_KEY', 'APY_KEY_HERE'),
+    "apy_key": os.environ.get('QUANDL_KEY', ''),
     "table": "WIKI/PRICES",
     "to_date": '2018-03-27',#datetime.datetime.now().strftime("%Y-%m-%d"),
     "max_date": '2018-03-27',

@@ -18,8 +18,8 @@ class TableManager:
             data = self.client.connect_to_table(table=self.table, ticker=ticker, from_date=from_date,
                                                 to_date=to_date, columns=columns, apikey=self.apy_key)
             return Ticker(name=ticker, data=data, columns=columns)
-        except:
-            raise
+        except ConnectionError as e:
+            raise e
 
 class PlottingManager:
 

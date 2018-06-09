@@ -31,9 +31,14 @@ def price_trend(ticker=None):
                 ticker_model = tm.retrieve_ticker(ticker=ticker, from_date=from_date, to_date=to_date,
                                                   columns=app_config["columns"])
                 script, div = pm.plot(ticker=ticker_model, measures=measure_list)
-                chart_title = messages["info"]["chart"].format(ticker, from_date, to_date);
+                chart_title = messages["info"]["chart"].format(ticker, from_date, to_date)
             except ValueError as e:
-                error_message = messages["errors"][str(e)].format(ticker);
+                error_message = messages["errors"][str(e)].format(ticker)
+            except ConnectionError as ce:
+                code = ce.__getattribute__("code")
+                message = ce.__getattribute__("message")
+                error_message = messages["errors"][str(ce)].format(code, message)
+
             return render_template("prices.html", ticker=ticker, script=script, div=div, measures=measure_list,
                                    chart_error=error_message, chart_title=chart_title, max_date=app_config["max_date"],
                                    start_date=from_date, end_date=to_date)

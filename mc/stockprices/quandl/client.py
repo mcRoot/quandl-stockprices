@@ -29,20 +29,23 @@ class QuandlClient:
 
             datatable_path = self.datatables_path.format(table_code=table, format=format)
             r = requests.get(self.base_url.format(path=datatable_path), params=payload)
-            self._check_statuscode(r.status_code)
+            self._check_response_status(r.json())
             json_resp = r.json()
             data = np.array(json_resp["datatable"]["data"])
             next_page_id = json_resp["meta"]["next_cursor_id"]
             while next_page_id is not None:
                 payload["qopts.cursor_id"] = next_page_id
                 r = requests.get(self.base_url.format(path=datatable_path), params=payload)
-                self._check_statuscode(r.status_code)
+                self._check_response_status(r.json())
                 json_resp = r.json()
                 data = np.concatenate((data, np.array(json_resp["datatable"]["data"])))
                 next_page_id = json_resp["meta"]["next_cursor_id"]
 
         return data
 
-    def _check_statuscode(self, code):
-        if (code >= 300):
-            raise ConnectionError("Something went wrong on connecting to QUANDL - error code {}".format(code))
+    def _check_response_status(self, code):
+        if "quandl_error" in code:
+            err = ConnectionError("quandl_connection_error")
+            err.__setattr__("code", code["quandl_error"]["code"])
+            err.__setattr__("message", code["quandl_error"]["message"])
+            raise err

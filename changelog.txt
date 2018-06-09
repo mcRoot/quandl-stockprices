@@ -1,0 +1,7 @@
+v. 1.1.0
+Several improvements:
+- better management of errors related to connecting to Quandl service.
+- better handling of the secret Quandl API key.
+
+v. 1.0.0
+First app release
